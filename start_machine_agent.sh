@@ -3,8 +3,23 @@
 # mapping of java properties to environment variables
 # https://docs.appdynamics.com/display/PRO45/Machine+Agent+Configuration+Properties
 
+#
+# log settings
+#
 
-LOG_CONFIG="-Dlog4j.configuration=file:/opt/appd/machine_agent/conf/logging/log4j.xml"
+mkdir -p ${APPDYNAMICS_AGENT_LOG_DIR}
+
+LOG_CONFIG="" # ini log config
+LOG_CONFIG+="-Dlog4j.configurationFile=$AGENT_DIR/conf/logging/log4j.xml "
+LOG_CONFIG+="-Dappdynamics.agent.logs.dir=${APPDYNAMICS_AGENT_LOG_DIR} "
+
+if [ "${APPDYNAMICS_DEBUG_LEVEL}" == "debug" ]; then
+    sed -i "s|info|debug|g" $AGENT_DIR/conf/logging/log4j.xml
+fi
+
+#
+# machine agent settings
+#
 
 MA_PROPERTIES="" # ini machine agent properties
 
@@ -14,7 +29,6 @@ MA_PROPERTIES+="-Dappdynamics.controller.port=${APPDYNAMICS_CONTROLLER_PORT} "
 MA_PROPERTIES+="-Dappdynamics.agent.accountName=${APPDYNAMICS_AGENT_ACCOUNT_NAME%%_*} "
 MA_PROPERTIES+="-Dappdynamics.agent.accountAccessKey=${APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY} "
 MA_PROPERTIES+="-Dappdynamics.controller.ssl.enabled=${APPDYNAMICS_CONTROLLER_SSL_ENABLED} "
-MA_PROPERTIES+="-Dappdynamics.agent.logs.dir=${APPDYNAMICS_AGENT_LOG_DIR} "
 
 # optional properties
 if [ "x${APPDYNAMICS_AGENT_UNIQUE_HOST_ID}" != "x" ]; then
@@ -69,5 +83,9 @@ if [ "x${APPDYNAMICS_AGENT_MAX_METRICS}" != "x" ]; then
     MA_PROPERTIES+="-Dappdynamics.agent.maxMetrics=${APPDYNAMICS_AGENT_MAX_METRICS} "
 fi
 
+echo "LOG_CONFIG: " $LOG_CONFIG
+echo "MA_PROPERTIES: " $MA_PROPERTIES
+echo "LOG_LEVEL: " $APPDYNAMICS_DEBUG_LEVEL
+
 # start Machine Agent
-nohup java ${MA_PROPERTIES} $LOG_CONFIG -jar machineagent.jar
+java ${MA_PROPERTIES} $LOG_CONFIG -jar machineagent.jar
