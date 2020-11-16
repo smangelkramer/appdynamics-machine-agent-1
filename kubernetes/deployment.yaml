@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appd-ma-http-listener
+  labels:
+    appd: machineagent
+    type: http-listener
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      type: http-listener
+  template:
+    metadata:
+      name: appd-machineagent
+      labels:
+        appd: machineagent
+        type: http-listener
+    spec:
+      containers:
+      - name: appd-machineagent
+        image: sm1705/appdynamics-machine-agent-http-listener:latest
+        env:
+          - name: APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY
+            valueFrom:
+                secretKeyRef:
+                    name: machine-agent
+                    key: controller-key
+        envFrom:
+        - configMapRef:
+            name: machine-agent-config
+        - secretRef:
+            name: machine-agent
+        resources:
+          limits:
+            cpu: 1000m
+            memory: "1G"
+          requests:
+            cpu: 500m
+            memory: "800M"
