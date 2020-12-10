@@ -34,12 +34,13 @@ ENV AGENT_DIR=${DOWNLOAD_FOLDER}
 ENV AGENT_VERSION=${DOWNLOAD_VERSION}
 # needed packages
 RUN apt-get update -y; \
-    apt-get install -y --no-install-recommends iproute2 procps dumb-init coreutils sed vim bash; \
+    apt-get install -y --no-install-recommends iproute2 procps dumb-init coreutils sed vim bash curl; \
 		rm -rf /var/lib/apt/lists/*
 # create folder and copy agent
 RUN mkdir -p ${AGENT_DIR}
 COPY --from=0 ${DOWNLOAD_FOLDER}/ ${AGENT_DIR}/
 WORKDIR ${AGENT_DIR}
+ADD heartbeat.sh .
 ADD start_machine_agent.sh .
 ENTRYPOINT /bin/bash ./start_machine_agent.sh
 #ENTRYPOINT tail -f /dev/null

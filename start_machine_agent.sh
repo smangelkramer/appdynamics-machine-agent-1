@@ -47,6 +47,11 @@ if [ "x${APPDYNAMICS_HTTP_LISTENER_PORT}" != "x" ]; then
     MA_PROPERTIES+="-Dmetric.http.listener.port=${APPDYNAMICS_HTTP_LISTENER_PORT} "
 fi    
 
+if [ "x${APPDYNAMICS_HTTP_LISTENER_HOST}" != "x" ]; then
+    MA_PROPERTIES+="-Dmetric.http.listener.host=${APPDYNAMICS_HTTP_LISTENER_HOST} "
+    ./heartbeat.sh ${APPDYNAMICS_HTTP_LISTENER_PORT} &
+fi  
+
 if [ "x${APPDYNAMICS_AGENT_HIERARCHY_PATH}" != "x" ]; then # "Data Center 1|Rack 2|Machine3"
     MA_PROPERTIES+="-Dappdynamics.agent.hierarchyPath=${APPDYNAMICS_AGENT_HIERARCHY_PATH} "
 fi    
